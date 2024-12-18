@@ -7,7 +7,7 @@ using UnityEngine;
 public class AutoGitProjectUpdater
 {
     // gitコマンドのファイル名
-    private const string GIT_FILENAME = "git";
+    private const string GIT_FILENAME = "C:\\Program Files\\Git\\bin\\git.exe";
 
     // リモートリポジトリの最新の状態を取得
     private const string PULL_CODE = "git pull";
@@ -81,7 +81,7 @@ public class AutoGitProjectUpdater
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
                 FileName = GIT_FILENAME,
-                Arguments = code,
+                Arguments = $"-c \"{code}\"",
                 WorkingDirectory = workingDirectory,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -95,9 +95,22 @@ public class AutoGitProjectUpdater
                 string error = process.StandardError.ReadToEnd();
                 process.WaitForExit();
 
-                UnityEngine.Debug.Log($"プロジェクトが最新の状態になりました：{output}");
-
+                // errorがない場合
                 if (!string.IsNullOrEmpty(error))
+                {
+                    // outputがある場合
+                    if (string.IsNullOrEmpty(output))
+                    {
+                        UnityEngine.Debug.Log($"プロジェクトが最新の状態になりました：{output}");
+                    }
+                    // outputがない場合
+                    else
+                    {
+                        UnityEngine.Debug.Log($"プロジェクトは既に最新の状態です：{output}");
+                    }
+                }
+                // errorがある場合
+                else
                 {
                     UnityEngine.Debug.LogError($"Git command {error}");
                 }
